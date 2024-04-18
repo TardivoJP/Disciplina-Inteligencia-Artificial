@@ -1,96 +1,141 @@
+//Estrutura de árvore
+
 public class Tree{
+    //Parâmetros da classe
+    //head para saber onde está o primeiro elemento da fila
+    //  utiliza tipo Integer para melhor nomeacao dos nós
+    //increment para nomear os nós de forma única
+    //maxChildren e minChildren para definir a faixa de filhos por nó
+    //steps para contar quantos passos para encontrar um elemento específico
     Node<Integer> head;
     int increment;
     int maxChildren;
     int minChildren;
     int steps;
 
+    //Construtor da estrutura, recebe as faixas de profundidade e filhos para estabelecer o tamanho da árvore
     public Tree(int maxDepth, int minDepth, int maxChildren, int minChildren){
         this.increment = 1;
         this.maxChildren = maxChildren;
         this.minChildren = minChildren;
-        this.head = new Node<Integer>(this.increment++);
+        //instanciando o primeiro elemento da árvore e chamando a função recursiva
+        this.head = new Node<Integer>(this.increment++, 1);
+        //A função é chamada com uma profundidade aleatória na faixa delimitada
         generateTree(1, this.head, randomNumber(maxChildren, minDepth));
     }
-
+    
+    //Função recursiva para gerar uma árvore aleatória
     public void generateTree(int depth, Node<Integer> node, int height){
+        //Critério de parada é chegar na profundidade desejada
         if(depth == height){
             return;
         }
-
+        
+        //Cria-se filhos aleatórios dentro da faixa estabelecida para o nó atual
         for(int i=0; i<randomNumber(this.maxChildren, this.minChildren); i++){
-            node.addChild(new Node<Integer>(this.increment++));
+            node.addChild(new Node<Integer>(this.increment++, depth+1));
         }
-
+        
+        //A função recursiva é chamada novamente para cada filho com a profundidade N+1
         for(Node<Integer> child : node.children){
             generateTree(depth+1, child, height);
         }
     }
-
+    
+    //Função para gerar um número aleatório dentro de uma faixa
     private int randomNumber(int max, int min){
         return (int)(Math.random() * (max - min + 1)) + min;
     }
 
+    //Função de busca em profundidade
     public void depthFirstSearch(){
+        //Inicializamos um StringBuilder para printar o resultado posteriormente
         StringBuilder sb = new StringBuilder();
+        //Primeira chamada recursiva com o nó head
         depthFirstSearchAux(this.head, sb);
         System.out.println(sb.toString());
     }
 
-    public void depthFirstSearchAux(Node<Integer> node, StringBuilder cur) {
-        if(cur.length() != 0) {
+    //Função auxiliar para realizar a recursão dos nós em profundidade
+    public void depthFirstSearchAux(Node<Integer> node, StringBuilder cur){
+        //Branch estético para adicionar flechas após cada número
+        if(cur.length() != 0){
             cur.append(" -> ");
         }
         cur.append(node.data);
-    
-        for(Node<Integer> child : node.children) {
+        
+        //Chamada da função novamente para cada filho
+        //  isso é propagado no call stack, então nada mais precisa ser feito
+        //  ou seja, sempre será resolvido em profundidade pelas chamadas recursivas
+        for(Node<Integer> child : node.children){
             depthFirstSearchAux(child, cur);
         }
     }
 
+    //Função de busca em largura
     public void breadthFirstSearch(){
+        //Inicializamos nossa estrutura de fila
         MyQueue<Node<Integer>> queue = new MyQueue<>();
+        //Inserimos o nó head na fila
         queue.offer(this.head);
+        //Inicializamos um StringBuilder para printar o resultado posteriormente
         StringBuilder sb = new StringBuilder();
+        //Primeira chamada recursiva com a fila inicial
         breadthFirstSearchAux(queue, sb);
         System.out.println(sb.toString());
     }
-
+    
+    //Função auxiliar para realizar a recursão dos nós em largura
     private void breadthFirstSearchAux(MyQueue<Node<Integer>> queue, StringBuilder cur){
+        //Se a fila estiver fazia, a árvore foi percorrida em sua totalidade
         if(queue.size() == 0){
             return;
+        //Branch estético para adicionar flechas após cada número
         }else{
-            if(cur.length() != 0){
-                cur.append(" -> ");
-            }
+          if(cur.length() != 0){
+            cur.append(" -> ");
+          }
         }
-
+        
+        //Armazenamos o primeiro da fila em uma variável temporária
         Node<Integer> firstInLine = queue.poll();
         cur.append(firstInLine.data);
+        //Adicionamos cada filho no fim da fila
+        //  ou seja, pegamos sempre o primeiro elemento, mas adicionamos os filhos no final
+        //  desta forma, simulamos a busca em profundidade
         for(Node<Integer> child : firstInLine.children){
             queue.offer(child);
         }
-
+        
+        //Realizamos a chamada recursiva novamente até esvaziar a fila
         breadthFirstSearchAux(queue, cur);
     }
 
+    //Função similar a profundiade, mas para mostrar a árvore completa de uma forma mais estética/didática
     public void printTree(){
-        printNode(this.head, 1);
-    }
-
-    private void printNode(Node<Integer> node, int depth){
+      //Inicializamos um StringBuilder para printar o resultado posteriormente
         StringBuilder sb = new StringBuilder();
-        for(int i=1; i<depth; i++){
-            sb.append("    ");
-        }
-        sb.append(node.data);
+        //Realizamos a primeira chamada recursiva com o nó head
+        //  também utilizamos uma variável de profundidade para adicionar espaços de forma heurística
+        printTreeAux(this.head, sb, 1);
         System.out.println(sb.toString());
+    }
 
+    //Função auxiliar para realizar a recursão dos nós em profundidade
+    private void printTreeAux(Node<Integer> node, StringBuilder cur, int depth){
+        //Para cada profundidade abaixo da primeira, adicionamos um espaço adicional
+        for(int i=1; i<depth; i++){
+            cur.append("    ");
+        }
+        cur.append(node.data + "\n");
+
+        //Chamada da função novamente para cada filho com profundidade N+1 para formar os espaços
         for(Node<Integer> child : node.children){
-            printNode(child, depth+1);
+            printTreeAux(child, cur, depth+1);
         }
     }
 
+    //Variação do método de profundidade para encontrar um valor específico
     public void depthFirstSearch(int value){
         StringBuilder sb = new StringBuilder();
         this.steps = 1;
@@ -98,10 +143,13 @@ public class Tree{
         System.out.println(sb.toString());
     }
 
+    //Função auxiliar para realizar a recursão dos nós em profundidade
+    //  agora é booleana para propagar "true" no callstack caso o valor seja encontrado e parar "mais cedo"
+    //  também utilizamos o parâmetro steps da classe para contar quantos passos para encontrar o valor
     public boolean depthFirstSearchAux(Node<Integer> node, StringBuilder cur, int value) {
         if(node.data == value){
             cur.setLength(0);
-            cur.append(String.format("Value %d found after %d steps", value, this.steps));
+            cur.append(String.format("Value %d found in depth %d after %d steps", value, node.depth, this.steps));
             return true;
         }
 
@@ -118,6 +166,7 @@ public class Tree{
         return false;
     }
 
+    //Variação do método de largura para encontrar um valor específico
     public void breadthFirstSearch(int value){
         MyQueue<Node<Integer>> queue = new MyQueue<>();
         queue.offer(this.head);
@@ -127,6 +176,9 @@ public class Tree{
         System.out.println(sb.toString());
     }
 
+    //Função auxiliar para realizar a recursão dos nós em profundidade
+    //  agora é booleana para propagar "true" no callstack caso o valor seja encontrado e parar "mais cedo"
+    //  também utilizamos o parâmetro steps da classe para contar quantos passos para encontrar o valor
     private boolean breadthFirstSearchAux(MyQueue<Node<Integer>> queue, StringBuilder cur, int value){
         if(queue.size() == 0){
             cur.append("Value not found");
@@ -135,7 +187,7 @@ public class Tree{
 
         Node<Integer> firstInLine = queue.poll();
         if(firstInLine.data == value){
-            cur.append(String.format("Value %d found after %d steps", value, this.steps));
+            cur.append(String.format("Value %d found in depth %d after %d steps", value, firstInLine.depth, this.steps));
             return true;
         }
 
