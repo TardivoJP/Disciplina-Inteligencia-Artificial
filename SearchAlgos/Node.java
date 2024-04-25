@@ -16,6 +16,8 @@ public class Node<T>{
     //  esse parâmetro não é utilizado na estrutura de árvore
     T data;
     int depth;
+    int weight;
+    Node<T> parent;
     ArrayList<Node<T>> children;
     Node<T> next;
 
@@ -23,6 +25,8 @@ public class Node<T>{
     public Node(T data){
         this.data = data;
         this.depth = 0;
+        this.weight = 0;
+        this.parent = null;
         this.children = new ArrayList<>();
         this.next = null;
     }
@@ -31,6 +35,18 @@ public class Node<T>{
     public Node(T data, int depth){
         this.data = data;
         this.depth = depth;
+        this.weight = 0;
+        this.parent = null;
+        this.children = new ArrayList<>();
+        this.next = null;
+    }
+
+    //Construtor alternativo com profundidade, peso e pai passados como argumento
+    public Node(T data, int depth, int weight, Node<T> parent){
+        this.data = data;
+        this.depth = depth;
+        this.weight = weight;
+        this.parent = parent;
         this.children = new ArrayList<>();
         this.next = null;
     }

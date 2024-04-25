@@ -1,3 +1,5 @@
+import java.util.Random;
+
 //Estrutura de fila
 //  utiliza tipo genérico <T> para funcionar com qualquer tipo de dado
 //  no caso da árvore teremos MyQueue<Node<Integer>>
@@ -64,5 +66,11 @@ public class MyQueue<T>{
     //Função que retorna o tamanho atual da fila
     public int size(){
         return this.size;
+    }
+
+    public void clearQueue(){
+        this.head = null;
+        this.tail = null;
+        this.size = 0;
     }
 }

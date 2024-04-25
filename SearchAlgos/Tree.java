@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 //Estrutura de árvore
 
 public class Tree{
@@ -12,10 +16,12 @@ public class Tree{
     int maxChildren;
     int minChildren;
     int steps;
+    boolean displayWeights;
 
     //Construtor da estrutura, recebe as faixas de profundidade e filhos para estabelecer o tamanho da árvore
     public Tree(int maxDepth, int minDepth, int maxChildren, int minChildren){
         this.increment = 1;
+        this.displayWeights = false;
         this.maxChildren = maxChildren;
         this.minChildren = minChildren;
         //instanciando o primeiro elemento da árvore e chamando a função recursiva
@@ -33,7 +39,7 @@ public class Tree{
         
         //Cria-se filhos aleatórios dentro da faixa estabelecida para o nó atual
         for(int i=0; i<randomNumber(this.maxChildren, this.minChildren); i++){
-            node.addChild(new Node<Integer>(this.increment++, depth+1));
+            node.addChild(new Node<Integer>(this.increment++, depth+1, randomNumber(1, 15), node));
         }
         
         //A função recursiva é chamada novamente para cada filho com a profundidade N+1
@@ -127,7 +133,12 @@ public class Tree{
         for(int i=1; i<depth; i++){
             cur.append("    ");
         }
-        cur.append(node.data + "\n");
+
+        if(displayWeights){
+            cur.append(node.data + " [" + node.weight + "]" + "\n");
+        }else{
+            cur.append(node.data + "\n");
+        }
 
         //Chamada da função novamente para cada filho com profundidade N+1 para formar os espaços
         for(Node<Integer> child : node.children){
@@ -149,7 +160,7 @@ public class Tree{
     public boolean depthFirstSearchAux(Node<Integer> node, StringBuilder cur, int value) {
         if(node.data == value){
             cur.setLength(0);
-            cur.append(String.format("Value %d found in depth %d after %d steps", value, node.depth, this.steps));
+            appendOptimalPath(cur, value, node);
             return true;
         }
 
@@ -187,7 +198,7 @@ public class Tree{
 
         Node<Integer> firstInLine = queue.poll();
         if(firstInLine.data == value){
-            cur.append(String.format("Value %d found in depth %d after %d steps", value, firstInLine.depth, this.steps));
+            appendOptimalPath(cur, value, firstInLine);
             return true;
         }
 
@@ -201,6 +212,72 @@ public class Tree{
             return true;
         }else{
             return false;
+        }
+    }
+
+    //Variação do método de largura para encontrar um valor específico
+    public void weightedSearch(int value){
+
+        ArrayList<Node<Integer>> arr = new ArrayList<>();
+        arr.add(this.head);
+        StringBuilder sb = new StringBuilder();
+        this.steps = 1;
+        weightedSearchAux(arr, sb, value);
+        System.out.println(sb.toString());
+    }
+
+
+    private boolean weightedSearchAux(ArrayList<Node<Integer>> arr, StringBuilder cur, int value){
+        if(arr.size() == 0){
+            cur.setLength(0);
+            cur.append("Value not found");
+            return false;
+        }
+
+        Collections.sort(arr, Comparator.comparingInt(node -> node.weight));
+
+        Node<Integer> firstInList = arr.get(0);
+        arr.remove(0);
+
+        if(cur.length() != 0){
+            cur.append(" -> ");
+        }
+        cur.append(firstInList.data);
+        
+        if(firstInList.data == value){
+            appendOptimalPath(cur, value, firstInList);
+            return true;
+        }
+
+        this.steps++;
+
+        for(Node<Integer> child : firstInList.children){
+            arr.add(child);
+        }
+
+        if(weightedSearchAux(arr, cur, value)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    private void appendOptimalPath(StringBuilder cur, int value, Node<Integer> node){
+        cur.append(String.format("\nValue %d found in depth %d after %d steps\n", value, node.depth, this.steps));
+        cur.append(String.format("Optimal Path -> ", value, node.depth, this.steps));
+
+        ArrayList<Integer> way = new ArrayList<>();
+
+        while(node != null){
+            way.add(node.data);
+            node = node.parent;
+        }
+
+        for (int i = way.size()-1; i>=0; i--) {
+            cur.append(way.get(i));
+            if(i != 0){
+                cur.append(" -> ");
+            }
         }
     }
 

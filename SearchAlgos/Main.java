@@ -21,23 +21,29 @@ public class Main {
           System.out.println("1. Generate new tree");
           //Ver árvore atual
           System.out.println("2. View current tree");
+          //mostrar ou não mostrar os pesos dos nós
+          System.out.println("3. Toggle weights on/off");
           System.out.println("=========================");
           //busca em profundidade
           System.out.println("DEPTH FIRST SEARCH");
           //percorrer a árvore completa
-          System.out.println("3. Full tree");
+          System.out.println("4. Full tree");
           //procurar um valor específico
-          System.out.println("4. Find specific value");
+          System.out.println("5. Find specific value");
           System.out.println("=========================");
           //busca em largura
           System.out.println("BREADTH FIRST SEARCH");
           //percorrer a árvore completa
-          System.out.println("5. Full tree");
+          System.out.println("6. Full tree");
           //procurar um valor específico
-          System.out.println("6. Find specific value");
+          System.out.println("7. Find specific value");
+          System.out.println("=========================");
+          System.out.println("WEIGHTED SEARCH");
+          //procurar um valor específico
+          System.out.println("8. Find specific value");
           System.out.println("=========================");
           //terminar o programa
-          System.out.println("7. Sair");
+          System.out.println("9. Exit");
           System.out.println("=========================");
           
           //switch com a execução dos operandos
@@ -67,9 +73,15 @@ public class Main {
               System.out.println("=========================");
               System.out.println("Depth First Search");
               System.out.println("=========================");
-              tree.depthFirstSearch();
+              tree.displayWeights = true;
               break;
             case 4:
+              System.out.println("=========================");
+              System.out.println("Depth First Search");
+              System.out.println("=========================");
+              tree.depthFirstSearch();
+              break;
+            case 5:
               System.out.println("=========================");
               System.out.println("Depth First Search");
               System.out.println("=========================");
@@ -77,13 +89,13 @@ public class Main {
               value = sc.nextInt();
               tree.depthFirstSearch(value);
               break;
-            case 5:
+            case 6:
               System.out.println("=========================");
               System.out.println("Breadth First Search");
               System.out.println("=========================");
               tree.breadthFirstSearch();
               break;
-            case 6:
+            case 7:
               System.out.println("=========================");
               System.out.println("Breadth First Search");
               System.out.println("=========================");
@@ -91,7 +103,15 @@ public class Main {
               value = sc.nextInt();
               tree.breadthFirstSearch(value);
               break;
-            case 7:
+            case 8:
+              System.out.println("=========================");
+              System.out.println("Weighted Search");
+              System.out.println("=========================");
+              System.out.println("Insert the value to search in the tree: ");
+              value = sc.nextInt();
+              tree.weightedSearch(value);
+              break;
+            case 9:
               System.out.println("See you next time!");
               break;
             default:
@@ -99,7 +119,7 @@ public class Main {
               break;
           }
         //condição de parada do menu, selecionar o valor da opção de saída
-        }while(op != 7);
+        }while(op != 9);
         
         //fechando o scanner
         sc.close();
