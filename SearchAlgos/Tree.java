@@ -11,6 +11,7 @@ public class Tree{
     //increment para nomear os nós de forma única
     //maxChildren e minChildren para definir a faixa de filhos por nó
     //steps para contar quantos passos para encontrar um elemento específico
+	//displayweights controla se vai mostrar os pesos ou não quando printar a arvore
     Node<Integer> head;
     int increment;
     int maxChildren;
@@ -133,7 +134,7 @@ public class Tree{
         for(int i=1; i<depth; i++){
             cur.append("    ");
         }
-
+		//mostramos os pesos dependendo da booleana que controla
         if(displayWeights){
             cur.append(node.data + " [" + node.weight + "]" + "\n");
         }else{
@@ -215,9 +216,9 @@ public class Tree{
         }
     }
 
-    //Variação do método de largura para encontrar um valor específico
+    //Função definindo a pesquisa com os pesos
     public void weightedSearch(int value){
-
+		//Criamos um arraylist para controlar os nós futuros e realizar o sort com base em seus pesos
         ArrayList<Node<Integer>> arr = new ArrayList<>();
         arr.add(this.head);
         StringBuilder sb = new StringBuilder();
@@ -226,16 +227,20 @@ public class Tree{
         System.out.println(sb.toString());
     }
 
-
+    //Função auxiliar para realizar a recursão dos nós com base nos pesos
+    //  agora é booleana para propagar "true" no callstack caso o valor seja encontrado e parar "mais cedo"
+    //  também utilizamos o parâmetro steps da classe para contar quantos passos para encontrar o valor
     private boolean weightedSearchAux(ArrayList<Node<Integer>> arr, StringBuilder cur, int value){
         if(arr.size() == 0){
             cur.setLength(0);
             cur.append("Value not found");
             return false;
         }
-
+		
+		//realizamos uma ordenação com base dos pesos de cada nó
         Collections.sort(arr, Comparator.comparingInt(node -> node.weight));
-
+		
+		//escolhemos o menor peso que será sempre o primeiro elemento, verificamos e tiramos da lista
         Node<Integer> firstInList = arr.get(0);
         arr.remove(0);
 
@@ -251,6 +256,7 @@ public class Tree{
 
         this.steps++;
 
+		//caso contrário adicionamos seus filhos na lista para serem ordenados e testados nas próximas chamadas recursivas
         for(Node<Integer> child : firstInList.children){
             arr.add(child);
         }
@@ -262,6 +268,8 @@ public class Tree{
         }
     }
 
+	//função auxiliar para mostrar o resultado na tela para o usuário
+	//mostramos quantos passos levou, em qual profundidade e qual seria o caminho ótimo
     private void appendOptimalPath(StringBuilder cur, int value, Node<Integer> node){
         cur.append(String.format("\nValue %d found in depth %d after %d steps\n", value, node.depth, this.steps));
         cur.append(String.format("Optimal Path -> ", value, node.depth, this.steps));

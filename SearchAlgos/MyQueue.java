@@ -68,6 +68,8 @@ public class MyQueue<T>{
         return this.size;
     }
 
+	//Função que esvazia a pilha
+	//Após setar como null o garbage collector do java elimina os nós
     public void clearQueue(){
         this.head = null;
         this.tail = null;

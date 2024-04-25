@@ -9,6 +9,8 @@ public class Node<T>{
     //data armazena um dado de qualquer tipo na estrutura de nó
     //depth armazena a profundidade do nó na estrutura da árvore
     //  esse parâmetro não é utilizado na estrutura de fila
+	//weight armazena o peso de cada nó para saber o seu custo de locomoção
+	//parent armazena o pai do nó para mostrar o melhor caminho até o root
     //children armazena os filhos deste nó para modelar a estrutura de árvore
     //  caso fosse um grafo mais generalizado poderiamos utilizar um HashSet para armazenar as adjacências/conexões
     //  esse parâmetro não é utilizado na estrutura de fila
