@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Node<String>{
+public class Node{
     String data;
     ArrayList<Edge> edges;
 
