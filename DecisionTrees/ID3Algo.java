@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Scanner;
 
 public class ID3Algo {
     public static void main(String[] args){
@@ -13,10 +14,62 @@ public class ID3Algo {
 
         String[] decisions = {"no", "no", "yes", "yes", "yes", "no", "yes", "no", "yes", "yes", "yes", "yes", "yes", "no"};
 
-        buildTree(headers, parameters, decisions);
+        DecisionTree tree = buildTree(headers, parameters, decisions);
+        Node cur = tree.root;
+        Scanner s = new Scanner(System.in);
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@");
+        System.out.println("Decision Tree Simulation");
+        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@");
+
+        outerloop:
+        while(true){
+            System.out.println("Choosing: " + cur.parameter);
+            String choice = "";
+
+            while(!cur.children.containsKey(choice)){
+                int count = 1;
+
+                for(String key : cur.children.keySet()){
+                    System.out.println(count + " - " + key);
+                    count++;
+                }
+
+                choice = s.nextLine();
+
+                if(!cur.children.containsKey(choice)){
+                    System.out.println("Invalid choice.");
+                }
+            }
+
+            cur = cur.children.get(choice);
+
+            if(cur.children.size() == 1){
+                for(String key : cur.children.keySet()){
+                    Node child = cur.children.get(key);
+
+                    if(child.decision){
+                        if(child.parameter.equals("yes")){
+                            System.out.println("You will play!");
+                        }else{
+                            System.out.println("You will NOT play!");
+                        }
+                        break outerloop;
+                    }else{
+                        cur = cur.children.get(key);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        s.close();
     }
 
-    public static void buildTree(String[] headers, String[][] parameters, String[] decisions){
+    public static DecisionTree buildTree(String[] headers, String[][] parameters, String[] decisions){
         HashMap<String, Integer> decisionMap = new HashMap<>();
 
         for(String decision : decisions){
@@ -50,6 +103,8 @@ public class ID3Algo {
         }
 
         printTree(tree.root, 0);
+
+        return tree;
     }
 
     public static Column[] setupAllParameters(String[] headers, String[][] parameters, String[] decisions, double totalEntropy){
@@ -60,7 +115,7 @@ public class ID3Algo {
 
             for(int j=0; j<columns[i].rows.length; j++){
                 if(!columns[i].rowsMap.containsKey(columns[i].rows[j])){
-                    columns[i].rowsMap.put(columns[i].rows[j], new Row());
+                    columns[i].rowsMap.put(columns[i].rows[j], new Row(columns[i].rows[j]));
                 }
 
                 if(!columns[i].rowsMap.get(columns[i].rows[j]).choices.containsKey(decisions[j])){
@@ -129,7 +184,7 @@ public class ID3Algo {
             ArrayList<Double> colEntropies = new ArrayList<>();
 
             for(String key : columns[i].rowsMap.keySet()){
-                Row localRow = new Row();
+                Row localRow = new Row(key);
                 int rowChoiceSpace = 0;
 
                 if(!colMap.containsKey(key)){
@@ -154,6 +209,7 @@ public class ID3Algo {
 
                 colChoiceSpaces.add(rowChoiceSpace);
                 colEntropies.add(localEntropy);
+                localRow.name = key;
                 localRow.totalChoices = rowChoiceSpace;
                 localRow.rowEntropy = localEntropy;
                 localRows.put(key, localRow);
@@ -173,10 +229,14 @@ public class ID3Algo {
             }
         }
 
-        Node child = new Node(columns[localMostChaoticIdx].header);
-        cur.children.put(columns[localMostChaoticIdx].header, child);
+        Node intermediate = new Node(columns[localMostChaoticIdx].header);
+        
+        cur.children.put(columns[localMostChaoticIdx].header, intermediate);
 
         for(String key : columns[localMostChaoticIdx].rowsMap.keySet()){
+            Node child = new Node(key);
+            intermediate.children.put(key, child);
+
             indexesToAvoid.add(localMostChaoticIdx);
             calcSubTree(localRows.get(key), indexesToAvoid, child, columns, parameters, decisions);
             indexesToAvoid.remove(localMostChaoticIdx);
@@ -198,12 +258,14 @@ public class ID3Algo {
     }
 
     public static class Row{
+        String name;
         int totalChoices;
         ArrayList<Integer> indexes;
         HashMap<String, Integer> choices;
         double rowEntropy;
 
-        public Row(){
+        public Row(String name){
+            this.name = name;
             this.totalChoices = 0;
             this.indexes = new ArrayList<>();
             this.choices = new HashMap<>();
